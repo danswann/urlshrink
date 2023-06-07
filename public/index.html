@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>URLShrink</title>
+        <script type="text/javascript">
+            const ROOT_URL = "http://localhost:5000/";
+            async function shrinkUrl()
+            {
+                let original = document.getElementById("urlin").value;
+                let result = await fetch(`${ROOT_URL}api/url`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({url: original})
+                });
+                if(result.status == 200)
+                {
+                    let data = await result.json();
+                    document.getElementById("urlout").innerHTML = `<span>Result:&nbsp;<a target="_blank" href="${ROOT_URL + data.shorter}">${ROOT_URL + data.shorter}</a>`;
+                } else alert(result.status);
+            }
+        </script>
+    </head>
+    <body>
+        <div style="text-align:center;">
+            <span style="font-size:20pt">URLShrink</span>
+            <br />
+            <br />
+            <label for="urlin">Shrink:</label>
+            <input type="text" id="urlin" />
+            <br />
+            <span id="urlout"></span>
+            <br />
+            <button onClick="shrinkUrl()">Shrink!</button>
+        </div>
+    </body>
+</html>
