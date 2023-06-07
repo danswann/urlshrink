@@ -23,12 +23,12 @@ app.UseSwaggerUI(c =>
 });
 
 // Add API routes
-app.MapPost("/api/url", (IncomingData data) => {
+app.MapPost("/api/shrink", (OriginalUrl data) => {
     // Create a new short URL
     try
     {
-        string shorter = UrlData.AddUrl(data.url);
-        return Results.Ok(new OutgoingData(shorter));
+        string urlShort = UrlData.AddUrl(data.url);
+        return Results.Ok(new ShrunkUrl(urlShort));
     }
     catch(TimeoutException te)
     {
@@ -36,8 +36,16 @@ app.MapPost("/api/url", (IncomingData data) => {
         return Results.Problem(statusCode: 500);
     }
 })
-.Produces<OutgoingData>(StatusCodes.Status200OK)
+.Produces<ShrunkUrl>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status500InternalServerError);
+
+app.MapGet("/api/lookup", (ShrunkUrl data) => {
+    var original = UrlData.GetOriginal(data.urlShort);
+    if(original == null) return Results.NotFound();
+    else return Results.Ok(new OriginalUrl(original));
+})
+.Produces<OriginalUrl>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
 
 app.MapGet("/", (HttpContext http) => {
     // Return the homepage

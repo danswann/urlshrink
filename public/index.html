@@ -7,7 +7,7 @@
             async function shrinkUrl()
             {
                 let original = document.getElementById("urlin").value;
-                let result = await fetch(`${ROOT_URL}api/url`, {
+                let result = await fetch(`${ROOT_URL}api/shrink`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

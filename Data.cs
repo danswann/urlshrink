@@ -1,20 +1,20 @@
 namespace urlshrink.Data;
 
-public record IncomingData
+public record OriginalUrl
 {
     public string url {get; set;}
 
-    public IncomingData(string url)
+    public OriginalUrl(string url)
     {
         this.url = url;
     }
 }
-public record OutgoingData
+public record ShrunkUrl
 {
-    public string shorter {get; set;}
-    public OutgoingData(string shorter)
+    public string urlShort {get; set;}
+    public ShrunkUrl(string shorter)
     {
-        this.shorter = shorter;
+        this.urlShort = shorter;
     }
 }
 public class UrlData
