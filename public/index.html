@@ -6,7 +6,12 @@
             const ROOT_URL = "http://localhost:5000/";
             async function shrinkUrl()
             {
-                let original = document.getElementById("urlin").value;
+                let original = document.getElementById("shrinkIn").value;
+                if(!original)
+                {
+                    document.getElementById("shrinkOut").innerHTML = `<span style="color:red;">Please put something in the input field!</span>`;
+                    return;
+                }
                 let result = await fetch(`${ROOT_URL}api/shrink`, {
                     method: "POST",
                     headers: {
@@ -17,22 +22,47 @@
                 if(result.status == 200)
                 {
                     let data = await result.json();
-                    document.getElementById("urlout").innerHTML = `<span>Result:&nbsp;<a target="_blank" href="${ROOT_URL + data.shorter}">${ROOT_URL + data.shorter}</a>`;
+                    document.getElementById("shrinkOut").innerHTML = `<span>Result:&nbsp;<a target="_blank" href="${ROOT_URL + data.urlShrunk}">${ROOT_URL + data.urlShrunk}</a>`;
                 } else alert(result.status);
+            }
+            async function unShrinkUrl()
+            {
+                let shrunk = document.getElementById("unShrinkIn").value;
+                if(!shrunk)
+                {
+                    document.getElementById("unShrinkOut").innerHTML = `<span style="color:red;">Please put something in the input field!</span>`;
+                    return;
+                }
+                let result = await fetch(`${ROOT_URL}api/lookup/${encodeURIComponent(shrunk)}`, {
+                    method: "GET"
+                });
+                if(result.status == 200)
+                {
+                    let data = await result.json();
+                    document.getElementById("unShrinkOut").innerHTML = `<span>Result:&nbsp;<a target="_blank" href="${data.url}">${data.url}</a>`;
+                }else alert(result.status);
             }
         </script>
     </head>
     <body>
         <div style="text-align:center;">
             <span style="font-size:20pt">URLShrink</span>
+        </div>
+        <div style="text-align:center;margin-top:60px;">
+            <label for="shrinkIn">Shrink:</label>
+            <input type="text" id="shrinkIn" />
             <br />
-            <br />
-            <label for="urlin">Shrink:</label>
-            <input type="text" id="urlin" />
-            <br />
-            <span id="urlout"></span>
+            <span id="shrinkOut"></span>
             <br />
             <button onClick="shrinkUrl()">Shrink!</button>
+        </div>
+        <div style="text-align:center;margin-top:60px;">
+            <label for="unShrinkIn">Unshrink:</label>
+            <input type="text" id="unShrinkIn" />
+            <br />
+            <span id="unShrinkOut"></span>
+            <br />
+            <button onClick="unShrinkUrl()">Unshrink!</button>
         </div>
     </body>
 </html>
