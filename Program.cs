@@ -9,7 +9,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => 
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "URLShrink API", Description = "Shortens arbitrary URLs", Version = "v1" });
-    c.EnableAnnotations();
 });
 
 // Create app from builder factory
@@ -25,10 +24,14 @@ app.UseSwaggerUI(c =>
 // Add API routes
 app.MapPost("/api/shrink", (OriginalUrl data) => {
     // Create a new short URL
+    if(!data.url.StartsWith("http://") && !data.url.StartsWith("https://"))
+    {
+        data.url = "http://" + data.url;
+    }
     try
     {
-        string urlShort = UrlData.AddUrl(data.url);
-        return Results.Ok(new ShrunkUrl(urlShort));
+        string urlShrunk = UrlData.AddUrl(data.url);
+        return Results.Ok(new ShrunkUrl(urlShrunk));
     }
     catch(TimeoutException te)
     {
@@ -39,8 +42,13 @@ app.MapPost("/api/shrink", (OriginalUrl data) => {
 .Produces<ShrunkUrl>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status500InternalServerError);
 
-app.MapGet("/api/lookup", (ShrunkUrl data) => {
-    var original = UrlData.GetOriginal(data.urlShort);
+app.MapGet("/api/lookup/{data}", (string data) => {
+    // Return original URL as JSON
+    var shrunk = Uri.UnescapeDataString(data);
+    var lastSlash = shrunk.LastIndexOf('/');
+    shrunk = shrunk.Substring(lastSlash + 1, shrunk.Length - (lastSlash + 1));
+    Console.WriteLine(shrunk);
+    var original = UrlData.GetOriginal(shrunk);
     if(original == null) return Results.NotFound();
     else return Results.Ok(new OriginalUrl(original));
 })
@@ -56,6 +64,7 @@ app.MapGet("/", (HttpContext http) => {
 .Produces(StatusCodes.Status200OK, contentType: "text/html");
 
 app.MapGet("/{*rest}", (HttpContext http, string rest) => {
+    // Return original URL as plaintext
     bool viewOnly = rest.EndsWith('-');
     if(viewOnly) rest = rest.Substring(0, rest.Length - 1);
     var original = UrlData.GetOriginal(rest);

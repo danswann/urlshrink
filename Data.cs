@@ -11,10 +11,10 @@ public record OriginalUrl
 }
 public record ShrunkUrl
 {
-    public string urlShort {get; set;}
+    public string urlShrunk {get; set;}
     public ShrunkUrl(string shorter)
     {
-        this.urlShort = shorter;
+        this.urlShrunk = shorter;
     }
 }
 public class UrlData
