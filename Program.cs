@@ -47,7 +47,6 @@ app.MapGet("/api/lookup/{data}", (string data) => {
     var shrunk = Uri.UnescapeDataString(data);
     var lastSlash = shrunk.LastIndexOf('/');
     shrunk = shrunk.Substring(lastSlash + 1, shrunk.Length - (lastSlash + 1));
-    Console.WriteLine(shrunk);
     var original = UrlData.GetOriginal(shrunk);
     if(original == null) return Results.NotFound();
     else return Results.Ok(new OriginalUrl(original));
